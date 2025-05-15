@@ -228,6 +228,8 @@ function createWindow() {
       window.version = "${version}";
       document.getElementById('version').textContent = 'v${version}';
     `);
+    // Check for updates after window is loaded
+    checkUpdates();
   });
 
   win.on('closed', () => {

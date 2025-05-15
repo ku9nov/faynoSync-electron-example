@@ -3,23 +3,57 @@
   "version": "0.0.1",
   "description": "Hello world app for testing faynoSync",
   "main": "src/main/main.js",
+  "author": "Serhii Kuianov <sergeyku9nov@gmail.com>",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux"
   },
   "keywords": [],
-  "author": "Serhii Kuyanov",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.5.0",
-    "electron": "^28.0.0",
     "marked": "^15.0.11",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "electron": ">=23.3.13"
+    "electron": ">=23.3.13",
+    "electron-builder": "^24.13.3"
   },
   "engines": {
     "npm": ">=8.19.3",
     "node": ">=18.13.0"
+  },
+  "build": {
+    "appId": "com.faynosync.electronexample",
+    "productName": "FaynoSync",
+    "files": [
+      "src/**/*",
+      "main.js",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
   }
 }
