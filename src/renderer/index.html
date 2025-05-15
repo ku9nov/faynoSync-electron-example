@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title id="title"></title>
+  <link rel="stylesheet" href="../styles/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <img src="../assets/logo.png" alt="App Logo" class="logo-img">
+        <h1 id="title" class="app-title"></h1>
+      </div>
+      <div class="version-info">
+        <span id="version" class="version-badge"></span>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="status-card">
+        <div class="status-icon">
+          <img src="../assets/check-circle.png" alt="Status" class="status-img">
+        </div>
+        <div class="status-content">
+          <h2 id="label">Hello, world!</h2>
+          <p class="status-description">Your application is running smoothly</p>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button id="checkUpdateBtn" class="btn btn-primary">
+          <img src="../assets/refresh.png" alt="Check Updates" class="btn-icon">
+          Check for Updates
+        </button>
+        <button id="settingsBtn" class="btn btn-secondary">
+          <img src="../assets/settings.png" alt="Settings" class="btn-icon">
+          Settings
+        </button>
+      </div>
+
+      <div id="updateBanner" class="update-banner hidden">
+        <div class="banner-content">
+          <img src="../assets/update.png" alt="Update Available" class="banner-icon">
+          <div class="banner-text">
+            <h3>Update Available</h3>
+            <p>A new version is ready to install</p>
+          </div>
+        </div>
+        <button id="updateNowBtn" class="btn btn-success">Update Now</button>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p class="footer-text">© 2024 Your Company Name. All rights reserved.</p>
+    </footer>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>
