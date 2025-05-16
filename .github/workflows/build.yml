@@ -1,0 +1,45 @@
+name: Build
+
+on: push
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Run npm install
+        run: npm ci
+        working-directory: .
+
+      - name: Run Build
+        run: npm run dist:linux
+        working-directory: .
+        
+      - name: List files in dist (DEBUG)
+        run: ls -R dist || echo "No dist directory found"
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-artifacts
+          path: |
+            dist/**/*.dmg
+            dist/**/*.deb
+            dist/**/*.rpm
+            dist/**/*.exe
+            dist/**/*.AppImage
+          if-no-files-found: warn
+        
