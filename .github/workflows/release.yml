@@ -5,6 +5,10 @@ on:
     types:
       - closed
 
+env:
+  ARTIFACT_EXTENSIONS: "dmg deb rpm exe AppImage"
+  APP_NAME: "faynosync"
+
 jobs:
   build:
     if: |
