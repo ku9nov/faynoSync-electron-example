@@ -9,7 +9,7 @@
     "build": "electron-builder",
     "dist:mac": "electron-builder --mac",
     "dist:win": "electron-builder --win",
-    "dist:linux": "electron-builder --linux",
+    "dist:linux": "electron-builder --linux --publish never",
     "test": "jest",
     "test:ci": "jest --ci --coverage"
   },
