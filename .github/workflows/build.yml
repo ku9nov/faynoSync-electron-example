@@ -4,6 +4,7 @@ on: push
 
 env:
   ARTIFACT_EXTENSIONS: "dmg deb rpm exe AppImage"
+  APP_NAME: "faynosync"
 
 jobs:
   build:
@@ -12,7 +13,6 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        # os: [ubuntu-latest]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,32 +34,32 @@ jobs:
       - name: List files in dist (DEBUG)
         run: ls -R dist || echo "No dist directory found"
 
-      - name: Filter FaynoSync artifacts for release (Linux/macOS)
+      - name: Filter artifacts for release (Linux/macOS)
         if: runner.os != 'Windows'
         run: |
           mkdir -p filtered
           for ext in $ARTIFACT_EXTENSIONS; do
-            find dist -type f -iname "*faynosync*.$ext" -exec cp -v {} filtered/ \;
+            find dist -type f -iname "*$APP_NAME*.$ext" -exec cp -v {} filtered/ \;
           done
           ls -lh filtered
         shell: bash
         env:
           ARTIFACT_EXTENSIONS: ${{ env.ARTIFACT_EXTENSIONS }}
+          APP_NAME: ${{ env.APP_NAME }}
       
-      - name: Filter FaynoSync artifacts for release (Windows)
+      - name: Filter artifacts for release (Windows)
         if: runner.os == 'Windows'
         run: |
           mkdir filtered
           foreach ($ext in $Env:ARTIFACT_EXTENSIONS.Split(" ")) {
-            Get-ChildItem -Path dist -Recurse -Filter "*faynosync*.$ext" -File | Copy-Item -Destination filtered
+            Get-ChildItem -Path dist -Recurse -Filter "*$($Env:APP_NAME)*setup*.$ext" -File | Copy-Item -Destination filtered
           }
           Get-ChildItem filtered
         shell: pwsh
         env:
           ARTIFACT_EXTENSIONS: ${{ env.ARTIFACT_EXTENSIONS }}
+          APP_NAME: ${{ env.APP_NAME }}
       
-      
-
       - name: Upload dist artifacts
         uses: actions/upload-artifact@v4
         with:
