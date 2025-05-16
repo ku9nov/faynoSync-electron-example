@@ -115,6 +115,6 @@ jobs:
         with:
           tag_name: ${{ env.version }}
           files: |
-            artifacts/*
+            artifacts/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
