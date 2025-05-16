@@ -34,17 +34,30 @@ jobs:
       - name: List files in dist (DEBUG)
         run: ls -R dist || echo "No dist directory found"
 
-      - name: Filter FaynoSync artifacts for release
+      - name: Filter FaynoSync artifacts for release (Linux/macOS)
+        if: runner.os != 'Windows'
         run: |
           mkdir -p filtered
-          shopt -s globstar nocaseglob
           for ext in $ARTIFACT_EXTENSIONS; do
-            cp -v dist/**/*faynosync*.${ext} filtered/ 2>/dev/null || true
+            find dist -type f -iname "*faynosync*.$ext" -exec cp -v {} filtered/ \;
           done
           ls -lh filtered
         shell: bash
         env:
           ARTIFACT_EXTENSIONS: ${{ env.ARTIFACT_EXTENSIONS }}
+      
+      - name: Filter FaynoSync artifacts for release (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          mkdir filtered
+          foreach ($ext in $Env:ARTIFACT_EXTENSIONS.Split(" ")) {
+            Get-ChildItem -Path dist -Recurse -Filter "*faynosync*.$ext" -File | Copy-Item -Destination filtered
+          }
+          Get-ChildItem filtered
+        shell: pwsh
+        env:
+          ARTIFACT_EXTENSIONS: ${{ env.ARTIFACT_EXTENSIONS }}
+      
       
 
       - name: Upload dist artifacts
