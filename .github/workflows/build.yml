@@ -8,8 +8,8 @@ jobs:
 
     strategy:
       matrix:
-        # os: [macos-latest, ubuntu-latest, windows-latest]
-        os: [ubuntu-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        # os: [ubuntu-latest]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,7 +25,7 @@ jobs:
         working-directory: .
 
       - name: Run Build
-        run: npm run dist:linux
+        run: npm run build
         working-directory: .
         
       - name: List files in dist (DEBUG)
