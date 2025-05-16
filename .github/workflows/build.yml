@@ -2,6 +2,9 @@ name: Build
 
 on: push
 
+env:
+  ARTIFACT_EXTENSIONS: "dmg deb rpm exe AppImage"
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -31,16 +34,25 @@ jobs:
       - name: List files in dist (DEBUG)
         run: ls -R dist || echo "No dist directory found"
 
+      - name: Filter FaynoSync artifacts for release
+        run: |
+          mkdir -p filtered
+          shopt -s globstar nocaseglob
+          for ext in $ARTIFACT_EXTENSIONS; do
+            cp -v dist/**/*faynosync*.${ext} filtered/ 2>/dev/null || true
+          done
+          ls -lh filtered
+        shell: bash
+        env:
+          ARTIFACT_EXTENSIONS: ${{ env.ARTIFACT_EXTENSIONS }}
+      
+
       - name: Upload dist artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-artifacts
           path: |
-            dist/**/*.dmg
-            dist/**/*.deb
-            dist/**/*.rpm
-            dist/**/*.exe
-            dist/**/*.AppImage
+            filtered/
           if-no-files-found: warn
         
   create-release:
@@ -90,10 +102,6 @@ jobs:
         with:
           tag_name: ${{ env.version }}
           files: |
-            artifacts/**/*.dmg
-            artifacts/**/*.deb
-            artifacts/**/*.rpm
-            artifacts/**/*.exe
-            artifacts/**/*.AppImage
+            artifacts/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
