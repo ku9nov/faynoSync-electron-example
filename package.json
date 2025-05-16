@@ -6,10 +6,10 @@
   "author": "Serhii Kuianov <sergeyku9nov@gmail.com>",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder",
-    "dist:mac": "electron-builder --mac",
-    "dist:win": "electron-builder --win",
-    "dist:linux": "electron-builder --linux",
+    "build": "electron-builder --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:win": "electron-builder --win --publish never",
+    "dist:linux": "electron-builder --linux --publish never",
     "test": "jest",
     "test:ci": "jest --ci --coverage"
   },
