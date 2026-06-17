@@ -2,8 +2,33 @@ const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const os = require('os');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const { version, app_name } = require('./config.js');
 const { checkForUpdates, openUpdateChoice } = require('./updater.js');
+
+let deviceId;
+function getDeviceId() {
+  if (deviceId) return deviceId;
+  const deviceIdPath = path.join(app.getPath('userData'), 'device-id');
+  try {
+    const stored = fs.readFileSync(deviceIdPath, 'utf8').trim();
+    if (stored) {
+      deviceId = stored;
+      return deviceId;
+    }
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      console.error('Error reading device id:', err);
+    }
+  }
+  deviceId = crypto.randomUUID();
+  try {
+    fs.writeFileSync(deviceIdPath, deviceId);
+  } catch (err) {
+    console.error('Error persisting device id:', err);
+  }
+  return deviceId;
+}
 
 function getLinuxDistributionFamily() {
   let distroFamily = 'Linux';
@@ -56,7 +81,7 @@ function createWindow() {
       document.getElementById('version').textContent = 'v${version}';
     `);
     // Check for updates after window is loaded
-    checkForUpdates();
+    checkForUpdates(getDeviceId());
   });
 
   win.on('closed', () => {
@@ -65,7 +90,7 @@ function createWindow() {
 
   // Handle IPC events
   ipcMain.on('check-updates', () => {
-    checkForUpdates();
+    checkForUpdates(getDeviceId());
   });
 
   ipcMain.on('update-now', () => {

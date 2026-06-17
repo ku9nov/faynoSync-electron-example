@@ -148,7 +148,7 @@ function createChoiceWindow(packageUrls, data) {
   return win;
 }
 
-async function checkForUpdates() {
+async function checkForUpdates(deviceId) {
   try {
     const resp = await getClient().checkForUpdates({
       owner,
@@ -157,6 +157,7 @@ async function checkForUpdates() {
       channel,
       platform: systemPlatform(),
       arch: systemArch(),
+      deviceId,
     });
     console.log(resp);
     lastResult = resp;
