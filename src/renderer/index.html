@@ -56,6 +56,42 @@
       <p class="footer-text">© 2024 Your Company Name. All rights reserved.</p>
     </footer>
   </div>
+
+  <div id="updateOverlay" class="update-overlay hidden">
+    <div id="updateModal" class="update-modal">
+      <div class="update-modal-header">
+        <h2 id="updateModalTitle">Checking for updates…</h2>
+        <span id="updateSource" class="update-source-badge hidden"></span>
+      </div>
+
+      <div id="updateCriticalWarning" class="update-critical hidden">
+        This is a critical update. Please install it as soon as possible.
+      </div>
+
+      <p id="updateVersionLine" class="update-version-line hidden"></p>
+
+      <div id="updateProgress" class="update-progress hidden">
+        <div class="update-progress-track">
+          <div id="updateProgressBar" class="update-progress-bar"></div>
+        </div>
+        <p id="updateProgressText" class="update-progress-text"></p>
+      </div>
+
+      <div id="updateChangelog" class="update-changelog hidden">
+        <h3>Changelog</h3>
+        <div id="updateChangelogContent" class="update-changelog-content"></div>
+      </div>
+
+      <p id="updateError" class="update-error hidden"></p>
+
+      <div class="update-actions">
+        <button id="updateRestartBtn" class="btn btn-success hidden">Restart now</button>
+        <button id="updateManualBtn" class="btn btn-primary hidden">Download manually</button>
+        <button id="updateLaterBtn" class="btn btn-secondary hidden">Later</button>
+      </div>
+    </div>
+  </div>
+
   <script src="renderer.js"></script>
 </body>
 </html>

@@ -1,11 +1,17 @@
-const { app, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
 
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = true;
 
 let wired = false;
-let onError = null;
+let manualFallback = null;
+let currentMeta = null;
+
+function send(channel, payload) {
+  const win = BrowserWindow.getAllWindows()[0];
+  if (win && !win.isDestroyed()) win.webContents.send(channel, payload);
+}
 
 function feedDirFromPackageUrls(packageUrls) {
   const yml = (packageUrls || []).find((p) => p.package === 'yml');
@@ -17,34 +23,43 @@ function wire() {
   if (wired) return;
   wired = true;
 
-  autoUpdater.on('download-progress', (p) => {
-    console.log(`Update download: ${Math.round(p.percent)}% (${p.transferred}/${p.total})`);
+  autoUpdater.on('update-available', (info) => {
+    send('update:meta', { ...currentMeta, fromVersion: app.getVersion(), version: info.version });
   });
 
-  autoUpdater.on('update-downloaded', async () => {
-    const { response } = await dialog.showMessageBox({
-      type: 'question',
-      title: 'Update ready',
-      message: 'The update has been downloaded. Restart now to install?',
-      buttons: ['Restart', 'Later'],
-      defaultId: 0,
+  autoUpdater.on('update-not-available', () => {
+    send('update:error', { message: 'No matching update found in feed metadata.' });
+  });
+
+  autoUpdater.on('download-progress', (p) => {
+    send('update:progress', {
+      percent: p.percent,
+      transferred: p.transferred,
+      total: p.total,
+      bytesPerSecond: p.bytesPerSecond,
     });
-    if (response === 0) {
-      autoUpdater.quitAndInstall();
-    }
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    send('update:ready');
   });
 
   autoUpdater.on('error', (err) => {
     console.error('autoUpdater error:', err);
-    if (onError) onError(err);
+    send('update:error', { message: String((err && err.message) || err) });
+  });
+
+  ipcMain.on('update:restart', () => autoUpdater.quitAndInstall());
+  ipcMain.on('update:manual', () => {
+    if (manualFallback) manualFallback();
   });
 }
 
 // Starts a silent background download for the update described by the faynoSync
-// response. Calls onErrorFallback(err) if electron-updater fails so the caller
-// can fall back to manual download. Returns false when background update is not
-// possible (dev mode or missing feed metadata).
-function startBackgroundUpdate(resp, onErrorFallback) {
+// response and drives the in-app update modal via IPC. onManual is invoked when
+// the user asks for a manual download (error state). Returns false when
+// background update is not possible (dev mode or missing feed metadata).
+function startBackgroundUpdate(resp, onManual) {
   if (!app.isPackaged) {
     // autoUpdater requires a packaged app. For local testing use a
     // dev-app-update.yml + autoUpdater.forceDevUpdateConfig = true.
@@ -56,8 +71,15 @@ function startBackgroundUpdate(resp, onErrorFallback) {
     console.log('No yml in packageUrls, cannot configure feed.');
     return false;
   }
-  onError = onErrorFallback || null;
+  manualFallback = onManual || null;
+  currentMeta = {
+    changelog: resp.changelog || '',
+    critical: Boolean(resp.critical),
+    source: resp.source || '',
+    fromVersion: app.getVersion(),
+  };
   wire();
+  send('update:meta', currentMeta);
   autoUpdater.setFeedURL({ provider: 'generic', url: feedUrl });
   autoUpdater.checkForUpdates();
   return true;

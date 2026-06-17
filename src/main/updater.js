@@ -168,6 +168,9 @@ async function checkForUpdates() {
       if (!started) {
         createChoiceWindow(resp.packageUrls, resp);
       }
+    } else {
+      const win = BrowserWindow.getAllWindows()[0];
+      if (win && !win.isDestroyed()) win.webContents.send('update-not-available');
     }
     return resp;
   } catch (err) {
