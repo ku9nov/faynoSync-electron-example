@@ -10,6 +10,16 @@ module.exports = {
   appId: 'com.faynosync.electronexample',
   productName: 'FaynoSync',
   files: ['src/**/*', 'main.js', 'package.json'],
+  extraMetadata: {
+    faynosync: {
+      appName: process.env.APP_NAME,
+      version: process.env.VERSION,
+      channel: process.env.CHANNEL,
+      owner: process.env.OWNER,
+      baseURL: process.env.BASE_URL,
+      edgeURL: process.env.EDGE_URL,
+    },
+  },
   directories: {
     buildResources: 'assets',
   },

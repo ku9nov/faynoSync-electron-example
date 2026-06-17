@@ -1,5 +1,6 @@
-const { BrowserWindow, dialog } = require('electron');
+const { BrowserWindow } = require('electron');
 const { Client, systemPlatform, systemArch } = require('@faynosync/sdk-js');
+const { startBackgroundUpdate } = require('./autoUpdate.js');
 const { version, app_name, channel, owner, baseURL, edgeURL } = require('./config.js');
 
 let client;
@@ -161,14 +162,10 @@ async function checkForUpdates() {
     lastResult = resp;
 
     if (resp.updateAvailable) {
-      const { response } = await dialog.showMessageBox({
-        type: 'question',
-        title: 'Update available',
-        message: 'You have an older version. Would you like to update your app?',
-        buttons: ['Yes', 'No'],
-        defaultId: 0,
+      const started = startBackgroundUpdate(resp, () => {
+        createChoiceWindow(resp.packageUrls, resp);
       });
-      if (response === 0) {
+      if (!started) {
         createChoiceWindow(resp.packageUrls, resp);
       }
     }
