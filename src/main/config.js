@@ -9,4 +9,6 @@ module.exports = {
   owner: process.env.OWNER || baked.owner || "admin",
   baseURL: process.env.BASE_URL || baked.baseURL || "http://localhost:9000",
   edgeURL: process.env.EDGE_URL || baked.edgeURL || "",
+  reportKey: process.env.REPORT_KEY || baked.reportKey || "",
+  reportIntervalMs: Number(process.env.REPORT_INTERVAL_MS) || 60000,
 };

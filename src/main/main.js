@@ -5,6 +5,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const { version, app_name } = require('./config.js');
 const { checkForUpdates, openUpdateChoice } = require('./updater.js');
+const { startReporting } = require('./reports.js');
 
 let deviceId;
 function getDeviceId() {
@@ -107,4 +108,7 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+  startReporting(getDeviceId());
+});

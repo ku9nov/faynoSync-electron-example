@@ -186,4 +186,4 @@ function openUpdateChoice() {
   }
 }
 
-module.exports = { checkForUpdates, openUpdateChoice, createChoiceWindow };
+module.exports = { checkForUpdates, openUpdateChoice, createChoiceWindow, getClient };
