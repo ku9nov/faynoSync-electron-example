@@ -18,6 +18,8 @@ module.exports = {
       owner: process.env.OWNER,
       baseURL: process.env.BASE_URL,
       edgeURL: process.env.EDGE_URL,
+      reportKey: process.env.REPORT_KEY,
+      autoDownload: process.env.AUTO_DOWNLOAD,
     },
   },
   directories: {

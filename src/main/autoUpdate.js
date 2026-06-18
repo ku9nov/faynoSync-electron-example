@@ -1,7 +1,8 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
+const { autoDownload } = require('./config.js');
 
-autoUpdater.autoDownload = true;
+autoUpdater.autoDownload = autoDownload;
 autoUpdater.autoInstallOnAppQuit = true;
 
 let wired = false;
@@ -23,8 +24,26 @@ function wire() {
   if (wired) return;
   wired = true;
 
-  autoUpdater.on('update-available', (info) => {
-    send('update:meta', { ...currentMeta, fromVersion: app.getVersion(), version: info.version });
+  autoUpdater.on('update-available', async (info) => {
+    const meta = { ...currentMeta, fromVersion: app.getVersion(), version: info.version };
+    if (autoDownload) {
+      send('update:meta', meta);
+      return;
+    }
+    const win = BrowserWindow.getAllWindows()[0];
+    const { response } = await dialog.showMessageBox(win && !win.isDestroyed() ? win : null, {
+      type: 'info',
+      title: 'Update available',
+      message: `Version ${info.version} is available (current ${app.getVersion()}).`,
+      detail: 'Do you want to download and install it now?',
+      buttons: ['Download', 'Later'],
+      defaultId: 0,
+      cancelId: 1,
+    });
+    if (response === 0) {
+      send('update:meta', meta);
+      autoUpdater.downloadUpdate();
+    }
   });
 
   autoUpdater.on('update-not-available', () => {
@@ -79,7 +98,7 @@ function startBackgroundUpdate(resp, onManual) {
     fromVersion: app.getVersion(),
   };
   wire();
-  send('update:meta', currentMeta);
+  if (autoDownload) send('update:meta', currentMeta);
   autoUpdater.setFeedURL({ provider: 'generic', url: feedUrl });
   autoUpdater.checkForUpdates();
   return true;

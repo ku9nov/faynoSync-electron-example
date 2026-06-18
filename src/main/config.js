@@ -11,4 +11,5 @@ module.exports = {
   edgeURL: process.env.EDGE_URL || baked.edgeURL || "",
   reportKey: process.env.REPORT_KEY || baked.reportKey || "",
   reportIntervalMs: Number(process.env.REPORT_INTERVAL_MS) || 60000,
+  autoDownload: String(process.env.AUTO_DOWNLOAD ?? baked.autoDownload ?? "true") !== "false",
 };

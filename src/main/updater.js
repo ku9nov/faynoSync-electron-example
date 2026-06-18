@@ -1,7 +1,7 @@
-const { BrowserWindow } = require('electron');
+const { BrowserWindow, dialog } = require('electron');
 const { Client, systemPlatform, systemArch } = require('@faynosync/sdk-js');
 const { startBackgroundUpdate } = require('./autoUpdate.js');
-const { version, app_name, channel, owner, baseURL, edgeURL } = require('./config.js');
+const { version, app_name, channel, owner, baseURL, edgeURL, autoDownload } = require('./config.js');
 
 let client;
 function getClient() {
@@ -148,6 +148,20 @@ function createChoiceWindow(packageUrls, data) {
   return win;
 }
 
+async function confirmUpdate(resp) {
+  const win = BrowserWindow.getAllWindows()[0];
+  const { response } = await dialog.showMessageBox(win && !win.isDestroyed() ? win : null, {
+    type: 'info',
+    title: 'Update available',
+    message: `An update is available (current ${version}).`,
+    detail: 'Do you want to install it now?',
+    buttons: ['Install', 'Later'],
+    defaultId: 0,
+    cancelId: 1,
+  });
+  return response === 0;
+}
+
 async function checkForUpdates(deviceId) {
   try {
     const resp = await getClient().checkForUpdates({
@@ -167,7 +181,9 @@ async function checkForUpdates(deviceId) {
         createChoiceWindow(resp.packageUrls, resp);
       });
       if (!started) {
-        createChoiceWindow(resp.packageUrls, resp);
+        if (autoDownload || (await confirmUpdate(resp))) {
+          createChoiceWindow(resp.packageUrls, resp);
+        }
       }
     } else {
       const win = BrowserWindow.getAllWindows()[0];
