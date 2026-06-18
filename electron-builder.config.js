@@ -38,7 +38,13 @@ module.exports = {
     sign: true,
   },
   win: {
-    target: ['nsis', 'zip'],
+    target: [
+      { target: 'nsis', arch: ['x64'] },
+      { target: 'zip', arch: ['x64'] },
+    ],
+  },
+  nsis: {
+    artifactName: '${productName}-Setup-${version}.${ext}',
   },
   linux: {
     target: ['AppImage', 'deb'],
